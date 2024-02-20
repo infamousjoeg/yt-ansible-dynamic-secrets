@@ -1,0 +1,4 @@
+ccp_base_url: https://cyberark.example.com
+ccp_app_id: Ansible
+ccp_safe: TestSafe
+ccp_validate_certs: yes

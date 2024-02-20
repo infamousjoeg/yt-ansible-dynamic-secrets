@@ -1,0 +1,37 @@
+- block:
+  - name: Retrieve SSH Private Key from CyberArk
+    cyberark.pas.cyberark_credential:
+      api_base_url: "{{ ccp_base_url }}"
+      app_id: "{{ ccp_app_id }}"
+      query: "Safe={{ ccp_safe }};Object=SyncVault/LOB_CD/D-Nix-AWS-EC2-Keypairs/Operating System-UnixSSHKeys-{{ inventory_hostname }}-ec2-user/password"
+      validate_certs: "{{ ccp_validate_certs }}"
+    register: cyberark_key_response
+
+  # Only necessary if retrieving an SSH private key, not needed for user/pass
+  - name: Initiate TempFile Module for SSH Private Key
+    ansible.builtin.tempfile:
+      state: file
+      suffix: key
+    register: temp_key
+
+  # Only necessary if retrieving an SSH private key, not needed for user/pass
+  - name: Write SSH Private Key to TempFile
+    ansible.builtin.copy:
+      dest: "{{ temp_key.path }}"
+      content: "{{ cyberark_key_response.result.Content }}"
+
+  # For SSH Private Key
+  - name: Set SSH Private Key TempFile to Fact
+    ansible.builtin.set_fact:
+      ansible_ssh_private_key_file: "{{ temp_key.path }}"
+
+  # For SSH User/Pass
+  # - name: Set SSH Password to Fact
+  #   ansible.builtin.set_fact:
+  #     ansible_ssh_password: "{{ cyberark_key_response.result.Content }}"
+
+  delegate_to: localhost
+  no_log: yes
+
+- name: Connect to Remote Host & Output Hostname
+  ansible.builtin.shell: hostname

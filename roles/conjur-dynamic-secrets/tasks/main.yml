@@ -1,0 +1,28 @@
+---
+- block:
+  - name: Create Conjur Identity file (.netrc)
+    ansible.builtin.template:
+      src: conjur.identity.j2
+      dest: /etc/conjur.identity
+
+  - name: Create Conjur Config file (.conjurrc)
+    ansible.builtin.template:
+      src: conjur.conf.j2
+      dest: /etc/conjur.conf
+
+  # SSH Private Key
+  - Set ansible_ssh_private_key_file Value
+    ansible.builtin.set_fact:
+      ansible_ssh_private_key_file: "{{ lookup('cyberark.conjur.conjur_variable', 'SyncVault/LOB_CD/D-Nix-AWS-EC2-Keypairs/Operating System-UnixSSHKeys-' + inventory_hostname + '-ec2-user/password', as_file=True) }}"
+
+  # SSH Username/Password
+  # - Set ansible_ssh_pass Value
+  #   set_fact:
+  #     ansible_ssh_pass: "{{ lookup('cyberark.conjur.conjur_variable', 'SyncVault/LOB_CD/D-Nix-Root/Operating System-UnixSSH-' + inventory_hostname + '-root/password') }}"
+
+  delegate_to: localhost
+  no_log: true
+  run_once: false
+
+- name: Connect to Remote Host & Output Hostname
+  ansible.builtin.shell: hostname
