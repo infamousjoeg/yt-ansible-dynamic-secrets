@@ -20,7 +20,7 @@
   #     ansible_ssh_pass: "{{ lookup('cyberark.conjur.conjur_variable', 'SyncVault/LOB_CD/D-Nix-Root/Operating System-UnixSSH-' + inventory_hostname + '-root/password') }}"
 
   delegate_to: localhost
-  no_log: true
+  no_log: no
 
 - name: Connect to Remote Host & Output Hostname
   ansible.builtin.shell: hostname
