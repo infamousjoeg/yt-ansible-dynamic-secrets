@@ -3,7 +3,7 @@
     cyberark.pas.cyberark_credential:
       api_base_url: "{{ ccp_base_url }}"
       app_id: "{{ ccp_app_id }}"
-      query: "Safe={{ ccp_safe }};Object=SyncVault/LOB_CD/D-Nix-AWS-EC2-Keypairs/Operating System-UnixSSHKeys-{{ inventory_hostname }}-ec2-user/password"
+      query: "Safe={{ ccp_safe }};Object=Operating System-PL-AWS-NIX-KEY-A-{{ inventory_hostname }}-ec2-user"
       validate_certs: "{{ ccp_validate_certs }}"
     register: cyberark_key_response
 
