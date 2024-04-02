@@ -7,12 +7,26 @@
       validate_certs: "{{ ccp_validate_certs }}"
     register: cyberark_key_response
 
+  - name: Debug CyberArk Response (Full)
+    ansible.builtin.debug:
+      var: cyberark_key_response
+
+  - name: Debug CyberArk Response (Content)
+    ansible.builtin.debug:
+      var: cyberark_key_response.result.Content
+
   # Only necessary if retrieving an SSH private key, not needed for user/pass
   - name: Initiate TempFile Module for SSH Private Key
     ansible.builtin.tempfile:
       state: file
       suffix: key
     register: temp_key
+
+  # Only necessary if retrieving an SSH private key, not needed for user/pass
+  - name: Set 0600 on SSH Private Key TempFile
+    ansible.builtin.file:
+      path: "{{ temp_key.path }}"
+      mode: '0600'
 
   # Only necessary if retrieving an SSH private key, not needed for user/pass
   - name: Write SSH Private Key to TempFile
