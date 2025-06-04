@@ -16,9 +16,8 @@
 
   # SSH Private Key
   - name: Retrieve SSH Private Key from Conjur
-    cyberark.conjur.conjur_variable:
-      path: "data/vault/PIN-INF-LIN-SUDOERS/Operating System-PL-AWS-NIX-KEY-A-{{ inventory_hostname }}-ubuntu/password"
-    register: conjur_ssh_key
+    ansible.builtin.set_fact:
+      conjur_ssh_key: "{{ lookup('cyberark.conjur.conjur_variable', 'data/vault/PIN-INF-LIN-SUDOERS/Operating System-PL-AWS-NIX-KEY-A-' + inventory_hostname + '-ubuntu/password') }}"
   
   - name: Create temporary file for SSH key
     ansible.builtin.tempfile:
