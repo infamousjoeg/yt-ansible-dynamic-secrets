@@ -33,7 +33,7 @@
 
   - name: View SSH key
     ansible.builtin.debug:
-      msg: "{{ lookup('file', {{ temp_ssh_key.path }}) }}"
+      msg: "{{ lookup('file', temp_ssh_key.path) }}"
   
   - name: Set ansible_ssh_private_key_file Value
     ansible.builtin.set_fact:
