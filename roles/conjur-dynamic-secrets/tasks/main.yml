@@ -9,18 +9,32 @@
       src: conjur.conf.j2
       dest: /etc/conjur.conf
 
-  # SSH Private Key
-  - name: Set ansible_ssh_private_key_file Value
-    ansible.builtin.set_fact:
-      ansible_ssh_private_key_file: "{{ lookup('cyberark.conjur.conjur_variable', 'data/vault/PIN-INF-LIN-SUDOERS/Operating System-PL-AWS-NIX-KEY-A-' + inventory_hostname + '-ubuntu/password', as_file=True) }}"
-
   # SSH Username/Password
   # - Set ansible_ssh_pass Value
   #   set_fact:
   #     ansible_ssh_pass: "{{ lookup('cyberark.conjur.conjur_variable', 'SyncVault/LOB_CD/D-Nix-Root/Operating System-UnixSSH-' + inventory_hostname + '-root/password') }}"
-  - name: Debug SSH Key File Path
-    ansible.builtin.debug:
-      msg: "{{ lookup('file', ansible_ssh_private_key_file) }}"
+
+  # SSH Private Key
+  - name: Retrieve SSH Private Key from Conjur
+    cyberark.conjur.conjur_variable:
+      path: "data/vault/PIN-INF-LIN-SUDOERS/Operating System-PL-AWS-NIX-KEY-A-{{ inventory_hostname }}-ubuntu/password"
+    register: conjur_ssh_key
+  
+  - name: Create temporary file for SSH key
+    ansible.builtin.tempfile:
+      state: file
+      suffix: .pem
+    register: temp_ssh_key
+  
+  - name: Write properly formatted SSH key to temp file
+    ansible.builtin.copy:
+      dest: "{{ temp_ssh_key.path }}"
+      content: "{{ conjur_ssh_key | regex_replace(' ', '\n') }}"
+      mode: '0600'
+  
+  - name: Set ansible_ssh_private_key_file Value
+    ansible.builtin.set_fact:
+      ansible_ssh_private_key_file: "{{ temp_ssh_key.path }}"
 
   delegate_to: localhost
   no_log: no
