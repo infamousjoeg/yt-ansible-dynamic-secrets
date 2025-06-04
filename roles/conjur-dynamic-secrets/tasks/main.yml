@@ -20,16 +20,7 @@
   #     ansible_ssh_pass: "{{ lookup('cyberark.conjur.conjur_variable', 'SyncVault/LOB_CD/D-Nix-Root/Operating System-UnixSSH-' + inventory_hostname + '-root/password') }}"
   - name: Debug SSH Key File Path
     ansible.builtin.debug:
-      msg: "{{ ansible_ssh_private_key_file }}"
-
-  - name: Verify SSH Key File Exists and Check Permissions
-    ansible.builtin.stat:
-      path: "{{ ansible_ssh_private_key_file }}"
-    register: key_file_stat
-
-  - name: Debug SSH Key File Stats
-    ansible.builtin.debug:
-      var: key_file_stat
+      msg: "{{ lookup('file', ansible_ssh_private_key_file) }}"
 
   delegate_to: localhost
   no_log: no
